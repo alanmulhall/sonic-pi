@@ -1,0 +1,58 @@
+# Purdie 'Sonic Pi' Shuffle
+# https://careerdrummer.files.wordpress.com/2012/06/purdie-half-time-shuffle.jpg
+# from: https://gist.github.com/mcrmfc/773950e065984468f804
+
+def triplet(pattern = [1,1,1])
+  pattern.each { |pulse| yield if pulse; sleep 0.333 }
+end
+
+def quaver(pattern = [1,1])
+  pattern.each { |pulse| yield if pulse; sleep 0.5 }
+end
+
+def crotchet
+  yield
+  sleep 1
+end
+
+use_bpm 130
+
+in_thread do
+  live_loop :hihat_foot do
+    cue :first_beat
+    4.times { crotchet { sample :drum_cymbal_pedal, rate: 1 } }
+  end
+end
+
+in_thread do
+  live_loop :hihat do
+    sync :first_beat
+    4.times { triplet([1,nil,1]) { sample :drum_cymbal_closed, rate: 1 } }
+  end
+end
+
+in_thread do
+  live_loop :snare do
+    sync :first_beat
+    sleep 2
+    crotchet { sample :drum_snare_soft, rate: 1, attack: 0 }
+    sleep 1
+  end
+end
+
+in_thread do
+  live_loop :grace_snare do
+    sync :first_beat
+    4.times { triplet([nil,1,nil]) { sample :drum_snare_soft, rate: 1, amp: 0.2 } }
+  end
+end
+
+in_thread do
+  live_loop :kick do
+    sync :first_beat
+    triplet([1,nil,nil]) { sample :drum_heavy_kick, rate: 1 }
+    triplet([nil,nil,1]) { sample :drum_heavy_kick, rate: 1 }
+    sleep 1
+    triplet([nil,nil,1]) { sample :drum_heavy_kick, rate: 1 }
+  end
+end

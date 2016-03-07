@@ -1,0 +1,14 @@
+live_loop :foo do
+  sample :loop_breakbeat, beat_stretch: 4, amp: 3
+  sleep 2
+end
+
+live_loop :chords, sync: :foo do
+  sync :foo
+  with_fx :distortion do
+    4.times do
+      sample :ambi_choir, beat_stretch: 8, amp: 1.5
+      sleep 2
+    end
+  end
+end
